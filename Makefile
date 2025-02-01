@@ -10,6 +10,7 @@ all: $(BIN) $(ABI)
 $(BUILD_DIR)/%.bin $(BUILD_DIR)/%.abi: contracts/%.sol
 	mkdir -p $(BUILD_DIR)/$(dir $*)
 	$(SOLC) --bin --abi $< -o $(BUILD_DIR)/$(dir $*)
+	truffle migrate --network sepolia
 
 clean:
 	rm -rf $(BUILD_DIR)
