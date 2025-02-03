@@ -9,12 +9,12 @@ interface IERC20 {
 contract Market {
     struct Offer {
         address seller;
-        uint256 amount; // 电量（单位：kWh）
-        uint256 pricePerUnit; // 单价（以代币计）
+        uint256 amount; // kWh
+        uint256 pricePerUnit; // unit price
         bool isAvailable;
     }
 
-    IERC20 public token; // 购买和支付的ERC20代币
+    IERC20 public token; // ERC20 coins
     uint256 public offerCounter;
     mapping(uint256 => Offer) public offers;
 
@@ -26,7 +26,6 @@ contract Market {
         token = IERC20(_tokenAddress);
     }
 
-    // 用户上架电量
     function createOffer(uint256 _amount, uint256 _pricePerUnit) external {
         require(_amount > 0, "Amount must be greater than zero");
         require(_pricePerUnit > 0, "Price per unit must be greater than zero");
@@ -42,7 +41,6 @@ contract Market {
         offerCounter++;
     }
 
-    // 用户购买电量
     function purchase(uint256 offerId, uint256 purchaseAmount) external {
         Offer storage offer = offers[offerId];
         require(offer.isAvailable, "Offer is not available");
@@ -50,7 +48,6 @@ contract Market {
 
         uint256 totalPrice = purchaseAmount * offer.pricePerUnit;
 
-        // 代币转账：买家支付给卖家
         require(token.transferFrom(msg.sender, offer.seller, totalPrice), "Payment failed");
 
         offer.amount -= purchaseAmount;
@@ -61,7 +58,6 @@ contract Market {
         emit Purchased(offerId, msg.sender, purchaseAmount, totalPrice);
     }
 
-    // 卖家取消自己的上架
     function cancelOffer(uint256 offerId) external {
         Offer storage offer = offers[offerId];
         require(msg.sender == offer.seller, "Only seller can cancel");

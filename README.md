@@ -1,10 +1,9 @@
-## install solc
+## Environment
 ### MacOS
 ```shell
-brew update
-brew upgrade
-brew tap ethereum/ethereum
-brew install solidity
+brew install nvm
+nvm install 22
+nvm use 22
 
 yarn install
 ```

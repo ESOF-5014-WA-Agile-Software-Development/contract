@@ -1,16 +1,22 @@
-SOLC = solc
-BUILD_DIR = build
+default:
+	npx hardhat compile
+	npx hardhat ignition deploy ./ignition/modules/Market.js --network sepolia
+	rm -rf artifacts
+	rm -rf cache
 
-SRC = $(shell find contracts -type f -name "*.sol")
-BIN = $(patsubst contracts/%.sol, $(BUILD_DIR)/%.bin, $(SRC))
-ABI = $(patsubst contracts/%.sol, $(BUILD_DIR)/%.abi, $(SRC))
+compile:
+	npx hardhat compile
 
-all: $(BIN) $(ABI)
+deploy:
+	npx hardhat ignition deploy ./ignition/modules/Market.js --network sepolia
 
-$(BUILD_DIR)/%.bin $(BUILD_DIR)/%.abi: contracts/%.sol
-	mkdir -p $(BUILD_DIR)/$(dir $*)
-	$(SOLC) --bin --abi $< -o $(BUILD_DIR)/$(dir $*)
-	truffle migrate --network sepolia
+holesky:
+	npx hardhat ignition deploy ./ignition/modules/Market.js --network holesky
+
+test:
+	npx hardhat test
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf artifacts
+	rm -rf cache
+	rm -rf ignition/deployments
