@@ -7,7 +7,7 @@ default:
 compile:
 	npx hardhat compile
 
-deploy:
+sepolia:
 	npx hardhat ignition deploy ./ignition/modules/Market.js --network sepolia
 
 holesky:
