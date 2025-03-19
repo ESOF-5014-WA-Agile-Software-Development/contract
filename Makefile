@@ -1,9 +1,6 @@
 default:
 	npx hardhat compile
 	npx hardhat ignition deploy ./ignition/modules/Market.js --network holesky
-	rm -rf artifacts
-	rm -rf cache
-	rm -rf ignition/deployments
 
 compile:
 	npx hardhat compile

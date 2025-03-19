@@ -1,11 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-interface IERC20 {
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-    function transfer(address recipient, uint256 amount) external returns (bool);
-}
-
 contract Market {
     struct Offer {
         address seller;
@@ -14,17 +9,12 @@ contract Market {
         bool isAvailable;
     }
 
-    IERC20 public token; // ERC20 coins
     uint256 public offerCounter;
     mapping(uint256 => Offer) public offers;
 
     event OfferCreated(uint256 indexed offerId, address indexed seller, uint256 amount, uint256 pricePerUnit);
     event OfferCancelled(uint256 indexed offerId, address indexed seller);
     event Purchased(uint256 indexed offerId, address indexed buyer, uint256 amount, uint256 totalPrice);
-
-    constructor(address _tokenAddress) {
-        token = IERC20(_tokenAddress);
-    }
 
     function createOffer(uint256 _amount, uint256 _pricePerUnit) external {
         require(_amount > 0, "Amount must be greater than zero");
@@ -41,15 +31,17 @@ contract Market {
         offerCounter++;
     }
 
-    function purchase(uint256 offerId, uint256 purchaseAmount) external {
+    function purchase(uint256 offerId, uint256 purchaseAmount) external payable {
         Offer storage offer = offers[offerId];
 
         require(offer.isAvailable, "Offer is not available");
         require(purchaseAmount > 0 && purchaseAmount <= offer.amount, "Invalid purchase amount");
 
         uint256 totalPrice = purchaseAmount * offer.pricePerUnit;
+        require(msg.value == totalPrice, "Incorrect ETH amount sent");
 
-        require(token.transferFrom(msg.sender, offer.seller, totalPrice), "Payment failed");
+        (bool success,) = payable(offer.seller).call{value: totalPrice}("");
+        require(success, "ETH transfer to seller failed");
 
         offer.amount -= purchaseAmount;
         if (offer.amount == 0) {
@@ -67,4 +59,6 @@ contract Market {
         offer.isAvailable = false;
         emit OfferCancelled(offerId, msg.sender);
     }
+
+    receive() external payable {}
 }
