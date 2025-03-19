@@ -43,6 +43,7 @@ contract Market {
 
     function purchase(uint256 offerId, uint256 purchaseAmount) external {
         Offer storage offer = offers[offerId];
+
         require(offer.isAvailable, "Offer is not available");
         require(purchaseAmount > 0 && purchaseAmount <= offer.amount, "Invalid purchase amount");
 
