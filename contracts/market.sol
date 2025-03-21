@@ -14,7 +14,7 @@ contract Market {
 
     event OfferCreated(uint256 indexed offerId, address indexed seller, uint256 amount, uint256 pricePerUnit);
     event OfferCancelled(uint256 indexed offerId, address indexed seller);
-    event Purchased(uint256 indexed offerId, address indexed buyer, uint256 amount, uint256 totalPrice);
+    event Purchased(uint256 indexed offerId, address indexed seller, address indexed buyer, uint256 amount, uint256 totalPrice);
 
     function createOffer(uint256 _amount, uint256 _pricePerUnit) external {
         require(_amount > 0, "Amount must be greater than zero");
@@ -48,7 +48,7 @@ contract Market {
             offer.isAvailable = false;
         }
 
-        emit Purchased(offerId, msg.sender, purchaseAmount, totalPrice);
+        emit Purchased(offerId, offer.seller, msg.sender, purchaseAmount, totalPrice);
     }
 
     function cancelOffer(uint256 offerId) external {
